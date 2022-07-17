@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         粉笔选项复制
 // @namespace    http://tampermonkey.net/
-// @version      0.14
+// @version      0.16
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.fenbi.com/spa/tiku/*
@@ -9,6 +9,7 @@
 // @grant        none
 // @info         只支持搜索和收藏，不支持错题
 // @todo         美化
+// @note         2022.07.17-V0.16 修复复制答案增加序号无效的问题
 // @note         2022.06.23-V0.15 非收藏界面自动隐藏功能按钮
 // @note         2022.06.22-V0.14 增加充值按钮和复制答案后增加序号的功能（用于同时使用Chrome、火狐）
 // @note         2022.04.15-V0.13 增加显示/隐藏按钮
@@ -16,7 +17,6 @@
 // @note         2022.04.15-V0.11 增加序号复制和自由加减功能
 // @note         已知问题1：Chrome 不能一次添加多个选中，会被覆盖，火狐可以
 // @note         已知问题2：火狐解析中图片不能正常加载（第二道及之后）
-// @run-at document-end
 // ==/UserScript==
 
 (function() {
@@ -183,7 +183,7 @@
         document.execCommand('copy');
         // selection.removeAllRanges();
 
-        var eles = document.getElementsByClassName('answer_add_btn')
+        var eles = document.getElementsByClassName('btn_answer_add')
         var color = eles[0].style.color;
         if (color == 'red') {
             check_update_nextInx(false, true);
@@ -294,7 +294,7 @@
     btn_answer_add.setAttribute("type", "button");
     btn_answer_add.setAttribute("value", "add");
     btn_answer_add.setAttribute("style", "position:fixed;top:300px;right:180px;font-size:30px;color:black");
-    btn_answer_add.setAttribute("class", "pro-btn");
+    btn_answer_add.setAttribute("class", "pro-btn btn_answer_add");
     btn_answer_add.onclick = function(event) {
         var color = btn_answer_add.style.color;
         if (color == 'red') {
