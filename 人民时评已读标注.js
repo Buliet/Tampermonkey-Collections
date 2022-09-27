@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name         人民时评已读标注
+// @name         文章已读标注
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  try to take over the world!
 // @author       You
 // @match        http://opinion.people.com.cn/GB/*
+// @match        http://www.chinasydw.org/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=people.com.cn
 // @grant        none
 // ==/UserScript==
@@ -12,8 +13,30 @@
 (function() {
     'use strict';
 
+    function getWebsiteName(){
+        var name="other";
+        var website_host = window.location.host;
+        if(website_host.indexOf("people.com.cn")!=-1){
+            name="popinion";
+        }else if(website_host.indexOf("chinasydw.org")!=-1){
+            name="chinasydw";
+        }
+        return name;
+    };
+
     var dbname = 'buliet';
-    var tbname = 'readinfo';
+
+    var tbname = getWebsiteName();
+    var parentEle;
+    if (tbname == 'popinion') {
+        parentEle = document.querySelector("body > div.t02 > table > tbody > tr > td:nth-child(3) > table:nth-child(2) > tbody > tr > td");
+    } else if (tbname == 'chinasydw') {
+        parentEle = document.querySelector("body > div.mainbox01.area04.clearfix > div.area04_left > div.listbox01 > div.body > ul")
+    } else {
+        alert("error website from addline");
+        return 0;
+    }
+
     var inxname = 'title';
     var color = 'blue'
     var db;
@@ -49,8 +72,6 @@
     function search(key, node = null, ret = 0) {
         var transaction = db.transaction(tbname);
         var objectStore = transaction.objectStore(tbname);
-        // var index = objectStore.index(inxname);
-        // var request = index.get(key);
         var request = objectStore.get(key);
         request.onerror = function(event) {
             console.log("objectStore.get err");
@@ -67,8 +88,7 @@
 
     function addAction_title() {
         var ret = 1;
-        var parent = document.querySelector("body > div.t02 > table > tbody > tr > td:nth-child(3) > table:nth-child(2) > tbody > tr > td");
-        var titleNodes = parent.getElementsByTagName('a');
+        var titleNodes = parentEle.getElementsByTagName('a');
         Array.from(titleNodes).forEach(e => {
             e.onclick = function(event) {
                 var title = e.innerText;
@@ -84,8 +104,7 @@
     function setColor() {
         var ret = 1;
         console.log('setColor action');
-        var parent = document.querySelector("body > div.t02 > table > tbody > tr > td:nth-child(3) > table:nth-child(2) > tbody > tr > td");
-        var titleNodes = parent.getElementsByTagName('a');
+        var titleNodes = parentEle.getElementsByTagName('a');
         for (var i = 0; i < titleNodes.length; i++) {
             var titlenode = titleNodes[i];
             var title = titlenode.innerText;
