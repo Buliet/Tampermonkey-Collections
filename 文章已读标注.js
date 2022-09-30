@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         文章已读标注
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  try to take over the world!
 // @author       You
 // @match        http://opinion.people.com.cn/GB/*
@@ -94,6 +94,14 @@
         var titleNodes = parentEle.getElementsByTagName('a');
         Array.from(titleNodes).forEach(e => {
             e.onclick = function (event) {
+                var title = e.innerText;
+                e.style.color = color;
+                add(title);
+            };
+
+        });
+        Array.from(titleNodes).forEach(e => {
+            e.oncontextmenu = function (event) {
                 var title = e.innerText;
                 e.style.color = color;
                 add(title);
